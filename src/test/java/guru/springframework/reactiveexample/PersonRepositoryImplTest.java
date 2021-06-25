@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.Instant;
 import java.util.List;
@@ -33,10 +34,22 @@ class PersonRepositoryImplTest {
     void getByIdSubscribe() {
         Mono<Person> personMono = this.personRepository.getById(1);
 
+        StepVerifier.create(personMono).expectNextCount(1).verifyComplete();
+
         personMono.subscribe(person -> {
             System.out.println(Instant.now().toString() + " Subscribe " +person.toString());
         });
+    }
 
+    @Test
+    void getByIdSubscribeNotFound() {
+        Mono<Person> personMono = this.personRepository.getById(15);
+
+        StepVerifier.create(personMono).expectNextCount(0).verifyComplete();
+
+        personMono.subscribe(person -> {
+            System.out.println(Instant.now().toString() + " Subscribe " +person.toString());
+        });
     }
 
     @Test
@@ -63,6 +76,8 @@ class PersonRepositoryImplTest {
     @Test
     void fluxTestSubscribe() {
         Flux<Person> personFlux = this.personRepository.findAll();
+
+        StepVerifier.create(personFlux).expectNextCount(4).verifyComplete();
 
         personFlux.subscribe(person -> {
             System.out.println(person.toString());
