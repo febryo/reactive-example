@@ -133,6 +133,10 @@ class PersonRepositoryImplTest {
 
         Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).single();
 
+        /**
+         *  doOnError will throw your expected exception
+         *  onErrorReturn instead throw an exception, you can modify your return.
+         */
         personMono.doOnError(throwable -> {
             System.out.println("Error catch "+throwable.getMessage());
         }).onErrorReturn(Person.builder().build()).subscribe(person -> {
